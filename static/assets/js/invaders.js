@@ -20,17 +20,27 @@ let cursors;
 let fireButton;
 let player;
 let bullets;
+let enemies;
+
+let scoreText;
+let livesText;
+
+let score = 0;
+let lives = 3;
 
 let game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.setBaseURL('http://labs.phaser.io');
 
-    this.load.image('sky', 'assets/skies/space3.png');
-    this.load.image('ship', 'assets/sprites/ship.png');
-    this.load.image('bullet', 'assets/sprites/poo.png', 20, 20);
+    this.load.image('sky', 'http://labs.phaser.io/assets/skies/space3.png');
+    this.load.image('ship', 'http://labs.phaser.io/assets/sprites/ship.png');
+    this.load.image('bullet', 'http://labs.phaser.io/assets/sprites/eggplant.png');
+    this.load.image('enemy', 'http://labs.phaser.io/assets/sprites/apple.png');
+
 }
+
+let enemyLocations = [[100, 100], [200, 100], [300, 100], [400, 100], [500, 100]];
 
 function create ()
 {
@@ -43,6 +53,23 @@ function create ()
 
     // Player Bullets
     bullets = this.physics.add.group();
+
+    // Enemies
+    enemies = this.physics.add.group();
+
+    // Kill enemy if shot
+    this.physics.add.overlap(bullets, enemies, killEnemy, null, this);
+
+    // Spawn Enemy ships
+    enemyLocations.forEach(location => {
+        spawnEnemy(location[0], location[1]);
+    });
+
+    //
+    scoreText = this.add.text(16, 16, 'SCORE: 0', { fontSize: '32px', fill: '#ffffff' });
+    livesText = this.add.text(16, 46, 'LIVES: 3', { fontSize: '32px', fill: '#ffffff' });
+
+
 
     // Control Listeners
     cursors = this.input.keyboard.createCursorKeys();
@@ -59,10 +86,6 @@ function update ()
         player.setVelocityX(-moveSpeed);
     } else if (cursors.right.isDown) {
         player.setVelocityX(moveSpeed);
-    //} else if (cursors.up.isDown) {
-    //    player.setVelocityY(-moveSpeed);
-    //} else if (cursors.down.isDown) {
-    //    player.setVelocityY(moveSpeed);
     } else {
         player.setVelocityX(0);
     }
@@ -70,7 +93,7 @@ function update ()
     if(fireButton.isDown){
         if(bulletDelay === 0){
             fireBullet();
-            bulletDelay = 10;
+            bulletDelay = 5;
         } else {
             bulletDelay--;
         }
@@ -78,10 +101,19 @@ function update ()
 }
 
 function fireBullet(){
-    console.log("FIRE");
     let bullet = bullets.create(player.x, player.y, 'bullet');
     bullet.setVelocityY(-500);
-    //bullet.setCollideWorldBounds(true);
     bullet.outOfBoundsKill = true;
+}
 
+function spawnEnemy(x, y){
+    let enemy = enemies.create(x, y, 'enemy');
+}
+
+function killEnemy(bullet, enemy){
+    bullet.disableBody(true, true);
+    enemy.disableBody(true, true);
+
+    score++;
+    scoreText.setText('Score: ' + score);
 }

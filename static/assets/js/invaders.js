@@ -66,12 +66,21 @@ let game = new Phaser.Game(config);
 
 
 function preload () {
-    this.load.image('sky', 'http://labs.phaser.io/assets/skies/space3.png');
-    this.load.image('ship', 'http://labs.phaser.io/assets/sprites/ship.png');
-    this.load.image('bullet', 'http://labs.phaser.io/assets/sprites/eggplant.png');
-    this.load.image('enemy', 'http://labs.phaser.io/assets/sprites/apple.png');
+    this.load.image('sky', '/assets/sprites/starfield.png');
+    this.load.image('ship', '/assets/sprites/player.png');
+    this.load.image('bullet', '/assets/sprites/bullet.png');
+    this.load.image('bullet2', '/assets/sprites/enemy-bullet.png');
 
-    this.load.image('button', 'http://labs.phaser.io/assets/sprites/button-bg.png');
+    this.load.spritesheet('enemy',
+        '/assets/sprites/invader32x32x4.png',
+        { frameWidth: 32, frameHeight: 32 }
+    );
+    this.anims.create({
+        key: 'idle',
+        frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+    });
 
     this.load.image('enemy2', 'http://labs.phaser.io/assets/sprites/ufo.png');
 }
@@ -234,7 +243,7 @@ function spawnEnemy(x, y) {
 }
 
 function enemyFire(enemy){
-    let bullet = enemyBullets.create(enemy.x, enemy.y, 'bullet');
+    let bullet = enemyBullets.create(enemy.x, enemy.y, 'bullet2');
     bullet.setVelocityY(300);
     bullet.outOfBoundsKill = true;
 }

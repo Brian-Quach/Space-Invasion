@@ -75,12 +75,12 @@ function preload () {
         '/assets/sprites/invader32x32x4.png',
         { frameWidth: 32, frameHeight: 32 }
     );
-    this.anims.create({
-        key: 'idle',
-        frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
+
+    this.load.spritesheet('explode',
+        '/assets/sprites/explode.png',
+        {frameWidth: 128, frameHeight: 128}
+    );
+
 
     this.load.image('enemy2', 'http://labs.phaser.io/assets/sprites/ufo.png');
 }
@@ -115,6 +115,21 @@ function create () {
     enemyLocations.forEach(location => {
         spawnEnemy(location[0], location[1]);
     });
+
+    //Animations
+
+    this.anims.create({
+        key: 'enemyIdle',
+        frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'explosion',
+        frames: this.anims.generateFrameNumbers('explode', { start: 0, end: 15 }),
+        frameRate: 10
+    });
+
 
     //
     scoreText = this.add.text(16, 16, 'SCORE: 0', { fontSize: '32px', fill: '#ffffff' });
@@ -250,7 +265,14 @@ function enemyFire(enemy){
 
 function killEnemy(bullet, enemy) {
     bullet.destroy();
-    enemy.destroy();
+
+    enemy.setTexture('explode');
+
+    enemy.anims.play('explosion', true);
+
+    enemy.on('animationcomplete', function(){
+        enemy.destroy();
+    }, this);
 
     ++score;
 
@@ -259,9 +281,14 @@ function killEnemy(bullet, enemy) {
 
 function killUFO(bullet, enemy){
     bullet.destroy();
-    enemy.destroy();
 
     activeUFO = false;
+
+    enemy.anims.play('explosion', true);
+
+    enemy.on('animationcomplete', function(){
+        enemy.destroy();
+    }, this);
 
     score+=5;
     scoreText.setText('Score: ' + score);

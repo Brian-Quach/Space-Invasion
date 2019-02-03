@@ -12,6 +12,17 @@
 
     <button  onclick="location.href = './main.html';">Play!</button>
 
+    <div id="store">
+        <h3>Purchase new ships!</h3>
+
+
+        <img src="/ship1.png" height="126" width="168"/>
+        <img src="/ship2.png" height="126" width="168"/>
+        <img src="/ship3.png" height="126" width="168"/>
+        <img src="/soon.png" height="126" width="168"/>
+
+    </div>
+
     <script>
         function httpGetAsync(theUrl, callback)
         {
@@ -28,7 +39,7 @@
         httpGetAsync('/user/' + window.localStorage.getItem('currentUser'), function(res, err){
             console.log(res);
             res = JSON.parse(res);
-            document.getElementById("Welcomemsg").innerHTML = 'Welcome back ' + res.usename + ", <br\> your balance is: " + res.balance;
+            document.getElementById("Welcomemsg").innerHTML = 'Welcome back ' + res.usename + ", <br\> your balance is: " + (res.balance === null ? 0 : res.balance);
         });
 
     </script>

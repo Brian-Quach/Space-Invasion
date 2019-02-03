@@ -196,10 +196,11 @@ function enemyFire(enemy){
 }
 
 function killEnemy(bullet, enemy) {
-    bullet.disableBody(true, true);
-    enemy.disableBody(true, true);
+    bullet.destroy();
+    enemy.destroy();
 
     ++score;
+
     scoreText.setText('Score: ' + score);
 }
 

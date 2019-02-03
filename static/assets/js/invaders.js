@@ -282,7 +282,7 @@ function killEnemy(bullet, enemy) {
 
     scoreText.setText('Score: ' + score);
 
-    if(enemyCount < 0){
+    if(enemyCount < 1){
         spawnNewWave();
     }
 }
@@ -373,5 +373,15 @@ function gameOver(){
 
     stateText.text = "GAME OVER \n SCORE: " + score;
     stateText.visible = true;
+
+    setTimeout(function(){
+        let xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("PUT", '/newscore', true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        let body = {"username": window.localStorage.getItem('currentUser'), "score": score};
+        xmlHttp.send(JSON.stringify(body));
+
+        window.location.href = "/home";
+    },3000);
 
 }

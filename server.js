@@ -16,6 +16,12 @@ app.use(function (req, res, next){
     next();
 });
 
+
+app.put('/newscore', function(req, res) {
+    console.log("hi");
+    console.log(req.body.score);
+});
+
 const PORT = 3000;
 app.listen(PORT, () =>{
     console.log("Started server on port", PORT);

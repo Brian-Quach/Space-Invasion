@@ -1,4 +1,4 @@
-/*const express = require('express');
+const express = require('express');
 const app = express();
 
 const bodyParser = require('body-parser');
@@ -16,11 +16,11 @@ app.use(function (req, res, next){
     next();
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>{
     console.log("Started server on port", PORT);
-});*/
-
+});
+/*
 var http = require('http');
 var fs = require('fs');
 
@@ -39,10 +39,10 @@ var server = http.createServer(function(request, response) {
     });
 
 
-/*    response.writeHead(200, {"Content-Type": "text/html"});
-    response.end("<p>Hello World!</p><p>hiiiii</p>");*/
+    response.writeHead(200, {"Content-Type": "text/html"});
+    response.end("<p>Hello World!</p><p>hiiiii</p>");
 
 }).listen(port);
 
 
-console.log("Server running at http://localhost:%d", port);
+console.log("Server running at http://localhost:%d", port);*/

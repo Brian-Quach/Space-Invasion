@@ -32,31 +32,65 @@ let db = admin.firestore()
 let user = null;
 
 
-app.put('/login', function(req, res) {
+app.put('/create', function(req, res) {
+	console.log("creating")
 	const username = req.body.username;
 	const password = req.body.password;
 
-	db.collection("users").add({
-	    "username": username,
-	    "password": password,
-	})
-	.then(function(docRef) {
-	    console.log("Document written with ID: ", docRef.id);
-	    res.status(200).send({"result": true})
-	})
-	.catch(function(error) {
-	    console.error("Error adding document: ", error);
-	});
+	console.log("creating")
+
+	var usersRef = db.collection('users');
+	var query = usersRef.where('username', '==', username).get()
+	  .then(snapshot => {
+	    if (snapshot.empty) {
+	    	// can create this user
+	      console.log('No matching documents.');
+	      	db.collection("users").add({
+			    "username": username,
+			    "password": password,
+			})
+			.then(function(docRef) {
+				//user = username
+			    console.log("Document written with ID: ", docRef.id);
+			    res.status(200).send({"result": true})
+			})
+			.catch(function(error) {
+			    console.error("Error adding document: ", error);
+			});
+	      return;
+	    } else {
+	    	// cannot create this user
+	    	console.log("this user already exists")
+	    	res.status(200).send({"result": false})
+	    }
+	  })
+	  .catch(err => {
+	    console.log('Error getting documents', err);
+	  });
 })
 
-app.get('/game', function(req, res) {
+app.put('/login', function(req, res) {
+	console.log("app logging in")
 
+	const username = req.body.username;
+	const password = req.body.password;
+
+	var usersRef = db.collection('users');
+	var query = usersRef.where('username', '==', username).where('password', '==', password).get()
+	  .then(snapshot => {
+	    if (snapshot.empty) {
+	    	// user does not exist
+	      res.status(200).send({"result": false})
+	    } else {
+	    	// found user
+	    	//user = username
+	    	res.status(200).send({"result": true})
+	    }
+	  })
+	  .catch(err => {
+	    console.log('Error getting documents', err);
+	  });
 })
-
-
-app.get('/gamer', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'static/main.html'));
-});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>{

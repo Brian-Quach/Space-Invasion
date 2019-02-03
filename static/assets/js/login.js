@@ -1,19 +1,17 @@
 let submitBtn = document.getElementById("submitBtn")
+let createBtn = document.getElementById("createBtn")
 let nameInput = document.getElementById("nameInput")
 let passInput = document.getElementById("passInput")
 
-submitBtn.addEventListener("click", function() {
-	console.log("button clicked")
+createBtn.addEventListener("click", function() {
 	let name = nameInput.value
 	let pass = passInput.value
 
-	goToGame()
-
-/*	getUserFromDb(name, pass).then(function(result) {
+	getUserFromDb(name, pass).then(function(result) {
 		let res = JSON.parse(result)
 		if (res.result) {
 			// need to start the game
-			startGame()
+			goToGame()
 		} else {
 			nameInput.value = ""
 			passInput.value = ""
@@ -21,14 +19,34 @@ submitBtn.addEventListener("click", function() {
 	}).catch(function(error) {
 		console.log("error getting user from database");
 		console.log(error);
-	}) */
+	})
 })
 
-function getUserFromDb(username, password) {
-	console.log("getting user from database")
+submitBtn.addEventListener("click", function() {
+	let name = nameInput.value
+	let pass = passInput.value
+
+	checkUserExists(name, pass).then(function(result) {
+		let res = JSON.parse(result)
+		if (res.result) {
+			// need to start the game
+			goToGame()
+		} else {
+			nameInput.value = ""
+			passInput.value = ""
+		}
+	}).catch(function(error) {
+		console.log("error getting user from database");
+		console.log(error);
+	})
+})
+
+
+function checkUserExists(username, password) {
 	return new Promise(function (resolve, reject) {
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.open("PUT", '/login', true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xmlHttp.onload = function () {
             if (this.status == 200) {
                 resolve(xmlHttp.responseText);
@@ -45,7 +63,35 @@ function getUserFromDb(username, password) {
                 statusText: xmlHttp.statusText
             });
         };
+        let body = {"username": username, "password": password}
 
+        xmlHttp.send(JSON.stringify(body));
+    });
+}
+
+
+function getUserFromDb(username, password) {
+	console.log("getting user from database")
+	return new Promise(function (resolve, reject) {
+        let xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("PUT", '/create', true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlHttp.onload = function () {
+            if (this.status == 200) {
+                resolve(xmlHttp.responseText);
+            } else {
+                reject({
+                    status: this.status,
+                    statusText: xmlHttp.statusText
+                });
+            }
+        };
+        xmlHttp.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xmlHttp.statusText
+            });
+        };
         let body = {"username": username, "password": password}
 
         xmlHttp.send(JSON.stringify(body));
@@ -78,6 +124,5 @@ function startGame() {
 }
 
 function goToGame() {
-	console.log("this")
 	window.location.href = './main.html'
 }

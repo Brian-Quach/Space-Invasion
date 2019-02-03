@@ -159,6 +159,34 @@ app.put('/newscore', function(req, res) {
     const username = req.body.username;
     const score = req.body.score;
 
+    console.log(score)
+
+    var usersRef = db.collection('users');
+	var query = usersRef.where('username', '==', username).where('password', '==', password).get()
+	  .then(snapshot => {
+	    if (snapshot.empty) {
+	    	// user does not exist
+	      res.status(200).send({"result": false})
+	    } else {
+	    	snapshot.forEach(doc => {
+	    		console.log(doc.data())
+	    		
+
+				doc.update({doc: doc + score})
+		        console.log(doc.id, '=>', doc.data());
+		    });
+
+	    	// found user
+	    	//user = username
+	    	res.status(200).send({"result": true})
+	    }
+	  })
+	  .catch(err => {
+	    console.log('Error getting documents', err);
+	  });
+
+
+
     if(balances[username] != null){
     	balances[username] += score;
 	} else {

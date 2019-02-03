@@ -1,7 +1,6 @@
 let myTurnDiv = document.getElementById("myGames")
 let theirTurnDiv = document.getElementById("theirGames")
-
-
+let onePlayer = document.getElementById("onePlayer")
 
 let searchStr = window.location.search
 let user1pos = searchStr.search("user1") + 6
@@ -16,6 +15,11 @@ while (char != '&' && user1pos < searchStr.length + 1) {
 
 console.log("user:")
 console.log(user1)
+
+
+onePlayer.addEventListener("click", function() {
+	goToGame(user1, "none")
+})
 
 getGamesFromDb(user1).then(function(result) {
 	let res = JSON.parse(result)

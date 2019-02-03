@@ -381,7 +381,8 @@ function gameOver(){
         let body = {"username": window.localStorage.getItem('currentUser'), "score": score};
         xmlHttp.send(JSON.stringify(body));
 
-        window.location.href = "/home";
+        let searchStr = "?user1=" + body.username
+        window.location.href = "../home.html" + searchStr;
     },3000);
 
 }

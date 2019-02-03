@@ -1,4 +1,5 @@
 const express = require('express');
+
 const app = express();
 
 const bodyParser = require('body-parser');
@@ -14,6 +15,47 @@ app.use(function (req, res, next){
 app.use(function (req, res, next){
     console.log("HTTP Response", res.statusCode);
     next();
+});
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("pkey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://mchacks6-4f2f0.firebaseio.com"
+});
+
+let db = admin.firestore()
+
+
+let user = null;
+
+
+app.put('/login', function(req, res) {
+	const username = req.body.username;
+	const password = req.body.password;
+
+	db.collection("users").add({
+	    "username": username,
+	    "password": password,
+	})
+	.then(function(docRef) {
+	    console.log("Document written with ID: ", docRef.id);
+	    res.status(200).send({"result": true})
+	})
+	.catch(function(error) {
+	    console.error("Error adding document: ", error);
+	});
+})
+
+app.get('/game', function(req, res) {
+
+})
+
+
+app.get('/gamer', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'static/main.html'));
 });
 
 const PORT = process.env.PORT || 3000;

@@ -67,7 +67,9 @@ function create ()
 
     // Bullet collisions
     this.physics.add.overlap(bullets, enemies, killEnemy, null, this);
+    this.physics.add.overlap(bullets, UFO, killUFO, null, this);
     this.physics.add.overlap(player, enemyBullets, playerHit, null, this);
+    this.physics.add.overlap(player, UFO, UFOCollide, null, this);
 
 
     // Spawn Enemy ships
@@ -158,25 +160,25 @@ function update ()
 }
 
 let activeUFO = false;
-let UFOChance = 0.1;
+let UFOChance = 0.005;
 function UFOAttack(){
     if(activeUFO === true){
 
-        console.log("UFO: " + currUFO.x + "," + currUFO.y);
-        console.log("PLR: " + player.x + "," + player.y);
-
-        console.log(currUFO.x > player.X);
-
-        if(currUFO.x > player.X){
-            currUFO.setVelocityX(-100);
+        if(currUFO.body.x > player.body.x){
+            currUFO.setVelocityX(-120);
         } else {
-            currUFO.setVelocityX(100);
+            currUFO.setVelocityX(120);
+        }
+
+        if(currUFO.body.y > player.body.y){
+            currUFO = null;
+            activeUFO = false;
         }
 
     } else if (Math.random() < UFOChance){
         currUFO = UFO.create(100, 100, 'enemy');
         currUFO.outOfBoundsKill = true;
-        currUFO.setVelocityY(50);
+        currUFO.setVelocityY(100);
         activeUFO = true;
     }
 }
@@ -205,13 +207,43 @@ function killEnemy(bullet, enemy){
     scoreText.setText('Score: ' + score);
 }
 
+function killUFO(bullet, enemy){
+    bullet.destroy();
+    enemy.destroy();
+
+    activeUFO = false;
+
+    score+=5;
+    scoreText.setText('Score: ' + score);
+}
+
+
 function playerHit(player, bullet){
     bullet.destroy();
     lives--;
     livesText.setText('LIVES: ' + lives);
 
     if(lives === 0){
-        //TODO: Game Over
+        gameOver();
     }
 
+}
+
+
+
+function UFOCollide(player, UFO){
+    UFO.destroy();
+    lives--;
+    livesText.setText('LIVES: ' + lives);
+
+    activeUFO = false;
+
+    if(lives === 0){
+        gameOver();
+    }
+
+}
+
+function gameOver(){
+    console.log("rip");
 }

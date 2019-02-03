@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Brian-Quach/McHacks6#readme",
   "dependencies": {
     "express": "^4.16.4",
-    "firebase-admin": "^6.0.0"
+    "firebase-admin": "^6.0.0",
+    "path": "^0.12.7"
   }
 }

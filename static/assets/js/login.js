@@ -15,7 +15,8 @@ createBtn.addEventListener("click", function() {
 		let res = JSON.parse(result)
 		if (res.result) {
 			// need to start the game
-			goToGame()
+            window.localStorage.setItem('currentUser', name);
+            goToGame();
 		} else {
 			nameInput.value = ""
 			passInput.value = ""
@@ -36,6 +37,7 @@ submitBtn.addEventListener("click", function() {
 		let res = JSON.parse(result)
 		if (res.result) {
 			// need to start the game
+            window.localStorage.setItem('currentUser', name);
 			goToGame()
 		} else {
 			nameInput.value = ""

@@ -21,6 +21,11 @@ let fireButton;
 let player;
 let bullets;
 let enemies;
+let enemyBullets;
+
+let UFO;
+let currUFO;
+
 
 let scoreText;
 let livesText;
@@ -37,6 +42,7 @@ function preload ()
     this.load.image('ship', 'http://labs.phaser.io/assets/sprites/ship.png');
     this.load.image('bullet', 'http://labs.phaser.io/assets/sprites/eggplant.png');
     this.load.image('enemy', 'http://labs.phaser.io/assets/sprites/apple.png');
+    this.load.image('enemy2', 'http://labs.phaser.io/assets/sprites/ufo.png');
 
 }
 
@@ -48,17 +54,21 @@ function create ()
     this.add.image(400, 300, 'sky');
 
     // Player
-    player = this.physics.add.sprite(100, 450, 'ship');
+    player = this.physics.add.sprite(100, 500, 'ship');
     player.setCollideWorldBounds(true);
-
-    // Player Bullets
-    bullets = this.physics.add.group();
 
     // Enemies
     enemies = this.physics.add.group();
+    UFO = this.physics.add.group();
 
-    // Kill enemy if shot
+    // Bullets
+    bullets = this.physics.add.group();
+    enemyBullets = this.physics.add.group();
+
+    // Bullet collisions
     this.physics.add.overlap(bullets, enemies, killEnemy, null, this);
+    this.physics.add.overlap(player, enemyBullets, playerHit, null, this);
+
 
     // Spawn Enemy ships
     enemyLocations.forEach(location => {
@@ -78,6 +88,12 @@ function create ()
 
 let bulletDelay = 0;
 
+let shootDelay = 50;
+let shootChance = 0.3;
+
+let enemyMoveCounter = 0;
+let enemyMoveThreshold = 100;
+
 function update ()
 {
     let moveSpeed = 200;
@@ -93,10 +109,75 @@ function update ()
     if(fireButton.isDown){
         if(bulletDelay === 0){
             fireBullet();
-            bulletDelay = 5;
+            bulletDelay = 20;
         } else {
             bulletDelay--;
         }
+
+    }
+
+    if(shootDelay-- === 0){
+        shootDelay = 50;
+        enemies.getChildren().forEach(enemy =>{
+            if(Math.random() < shootChance){
+                enemyFire(enemy);
+            }
+        });
+    }
+
+    if(enemyMoveCounter <= enemyMoveThreshold){
+        enemies.setVelocityX(100);
+    } else {
+        enemies.setVelocityX(-100);
+    }
+
+    if(enemyMoveCounter <= enemyMoveThreshold*.25){
+        enemies.setVelocityY(50);
+    } else if(enemyMoveCounter <= enemyMoveThreshold*.5){
+        enemies.setVelocityY(-50);
+    } else if (enemyMoveCounter <= enemyMoveThreshold*.75){
+        enemies.setVelocityY(50);
+    } else if(enemyMoveCounter <= enemyMoveThreshold){
+        enemies.setVelocityY(-50);
+    } else if (enemyMoveCounter <= enemyMoveThreshold*1.25){
+        enemies.setVelocityY(50);
+    } else if(enemyMoveCounter <= enemyMoveThreshold*1.5){
+        enemies.setVelocityY(-50);
+    } else if (enemyMoveCounter <= enemyMoveThreshold*1.75){
+        enemies.setVelocityY(50);
+    } else {
+        enemies.setVelocityY(-50);
+    }
+
+    if(enemyMoveCounter++ > enemyMoveThreshold*2){
+        enemyMoveCounter = 0;
+    }
+
+    UFOAttack();
+
+}
+
+let activeUFO = false;
+let UFOChance = 0.1;
+function UFOAttack(){
+    if(activeUFO === true){
+
+        console.log("UFO: " + currUFO.x + "," + currUFO.y);
+        console.log("PLR: " + player.x + "," + player.y);
+
+        console.log(currUFO.x > player.X);
+
+        if(currUFO.x > player.X){
+            currUFO.setVelocityX(-100);
+        } else {
+            currUFO.setVelocityX(100);
+        }
+
+    } else if (Math.random() < UFOChance){
+        currUFO = UFO.create(100, 100, 'enemy');
+        currUFO.outOfBoundsKill = true;
+        currUFO.setVelocityY(50);
+        activeUFO = true;
     }
 }
 
@@ -110,10 +191,27 @@ function spawnEnemy(x, y){
     let enemy = enemies.create(x, y, 'enemy');
 }
 
+function enemyFire(enemy){
+    let bullet = enemyBullets.create(enemy.x, enemy.y, 'bullet');
+    bullet.setVelocityY(300);
+    bullet.outOfBoundsKill = true;
+}
+
 function killEnemy(bullet, enemy){
-    bullet.disableBody(true, true);
-    enemy.disableBody(true, true);
+    bullet.destroy();
+    enemy.destroy();
 
     score++;
     scoreText.setText('Score: ' + score);
+}
+
+function playerHit(player, bullet){
+    bullet.destroy();
+    lives--;
+    livesText.setText('LIVES: ' + lives);
+
+    if(lives === 0){
+        //TODO: Game Over
+    }
+
 }

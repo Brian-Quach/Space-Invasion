@@ -96,6 +96,10 @@ let enemyMoveThreshold = 100;
 function update() {
     let moveSpeed = 200;
 
+    if (lives <= 0) {
+        return;
+    }
+
     if (cursors.left.isDown) {
         player.setVelocityX(-moveSpeed);
     } else if (cursors.right.isDown) {

@@ -82,10 +82,11 @@ function preload () {
     );
 
 
-    this.load.image('enemy2', 'http://labs.phaser.io/assets/sprites/ufo.png');
+    this.load.image('enemy2', '/assets/sprites/invader.png');
 }
 
-let enemyLocations = [[100, 100], [200, 100], [300, 100], [400, 100], [500, 100]];
+let enemyCount = 0
+
 
 function create () {
     // Background
@@ -112,9 +113,11 @@ function create () {
     userInterface = this.physics.add.group();
 
     // Spawn Enemy ships
-    enemyLocations.forEach(location => {
+    let enemyLocs = getEnemyLocations();
+    enemyLocs.forEach(location => {
         spawnEnemy(location[0], location[1]);
     });
+    enemyCount = enemyLocs.length;
 
     //Animations
 
@@ -240,7 +243,7 @@ function UFOAttack(){
         }
 
     } else if (Math.random() < UFOChance){
-        currUFO = UFO.create(100, 100, 'enemy');
+        currUFO = UFO.create((Math.random() * 800), 0, 'enemy2');
         currUFO.outOfBoundsKill = true;
         currUFO.setVelocityY(100);
         activeUFO = true;
@@ -272,11 +275,47 @@ function killEnemy(bullet, enemy) {
 
     enemy.on('animationcomplete', function(){
         enemy.destroy();
+        enemyCount--;
     }, this);
 
     ++score;
 
     scoreText.setText('Score: ' + score);
+
+    if(enemyCount < 0){
+        spawnNewWave();
+    }
+}
+
+function getEnemyLocations(){
+    let levels = [
+        [[100,100],[150,100],[100,200],[150,200],[100,300],[150,300],
+            [200,100],[250,100],[200,200],[250,200],[200,300],[250,300],
+            [300,100],[350,100],[300,200],[350,200],[300,300],[350,300],
+            [400,100],[450,100],[400,200],[450,200],[400,300],[450,300]],
+        [[100,150],[125,150],[150,150],[175,150],[200,150],[225,150],
+            [250,150],[275,150],[300,150],[325,150],[350,150],[375,150],
+            [400,150],[425,150],[450,150],[475,150],[500,150]],
+        [[100,100],[150,150],[200,100],[250,150],[300,100],[350,150],[400,100],
+        [450,150],[500,100]],
+        [[100,250],[150,250],[200,250],[250,250],[300,250],[350,250],[400,250],[450,250],[500,250],
+        [150,200],[450,200]]
+    ];
+
+    return levels[Math.floor(Math.random()*levels.length)];
+}
+
+function spawnNewWave(){
+
+    let enemyLocs = getEnemyLocations();
+    enemyLocs.forEach(location => {
+        spawnEnemy(location[0], location[1]);
+    });
+    enemyCount = enemyLocs.length;
+
+    shootDelay -= 5;
+    shootChance += 0.05;
+    UFOChance += 0.005;
 }
 
 function killUFO(bullet, enemy){
@@ -305,7 +344,6 @@ function playerHit(player, bullet){
     }
 
 }
-
 
 
 function UFOCollide(player, UFO){

@@ -31,13 +31,59 @@ let db = admin.firestore()
 
 let user = null;
 
+app.put('/homeGames', function(req, res) {
+	const username = req.body.username;
+	console.log("receiving")
+
+	gs = []
+
+	var gamesRef = db.collection('games');
+	var query = gamesRef.where('user1', '==', username).get()
+	  .then(snapshot => {
+	    if (snapshot.empty) {
+	    	// can create this user
+	      console.log('No matching documents.');
+	    } else {
+	    	// this used has games
+			snapshot.forEach(doc => {
+				gs.push(doc.data())
+		        console.log(doc.id, '=>', doc.data());
+		    });
+	    }
+	  }).then(function() {
+	  	var query2 = gamesRef.where('user2', '==', username).get()
+	  .then(snapshot => {
+	    if (snapshot.empty) {
+	    	// can create this user
+	      console.log('No matching documents.');
+	    } else {
+	    	// this used has games
+			snapshot.forEach(doc => {
+				gs.push(doc.data())
+		        console.log(doc.id, '=>', doc.data());
+		    });
+
+		    res.status(200).send({"result": true, "games": gs})
+	    }
+	  })
+	  .catch(err => {
+	    console.log('Error getting documents', err);
+	  });
+	  console.log(gs)
+	  })
+	  .catch(err => {
+	    console.log('Error getting documents', err);
+	  });
+
+	  
+	
+})
+
 
 app.put('/create', function(req, res) {
 	console.log("creating")
 	const username = req.body.username;
 	const password = req.body.password;
-
-	console.log("creating")
 
 	var usersRef = db.collection('users');
 	var query = usersRef.where('username', '==', username).get()

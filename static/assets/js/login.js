@@ -3,9 +3,13 @@ let createBtn = document.getElementById("createBtn")
 let nameInput = document.getElementById("nameInput")
 let passInput = document.getElementById("passInput")
 
+let mainName = null;
+
 createBtn.addEventListener("click", function() {
 	let name = nameInput.value
 	let pass = passInput.value
+
+	mainName = name
 
 	getUserFromDb(name, pass).then(function(result) {
 		let res = JSON.parse(result)
@@ -25,6 +29,8 @@ createBtn.addEventListener("click", function() {
 submitBtn.addEventListener("click", function() {
 	let name = nameInput.value
 	let pass = passInput.value
+
+	mainName = name
 
 	checkUserExists(name, pass).then(function(result) {
 		let res = JSON.parse(result)
@@ -93,7 +99,7 @@ function getUserFromDb(username, password) {
             });
         };
         let body = {"username": username, "password": password}
-
+        console.log("sending request")
         xmlHttp.send(JSON.stringify(body));
     });
 }
@@ -124,5 +130,6 @@ function startGame() {
 }
 
 function goToGame() {
-	window.location.href = './main.html'
+	searchStr = "?user1=" + mainName
+	window.location.href = './home.html' + searchStr
 }

@@ -378,7 +378,7 @@ function gameOver(){
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.open("PUT", '/newscore', true);
         xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        let body = {"username": window.localStorage.getItem('currentUser'), "score": score};
+        let body = {username: window.localStorage.getItem('currentUser'), score: score};
         xmlHttp.send(JSON.stringify(body));
 
         let searchStr = "?user1=" + body.username

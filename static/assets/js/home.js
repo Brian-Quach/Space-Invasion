@@ -78,6 +78,12 @@ function challengePlayer(playerName) {
     });
 }
 
+httpGetAsync('/user/' + window.localStorage.getItem('currentUser'), function(res, err){
+    console.log(res);
+    res = JSON.parse(res);
+    document.getElementById("total").innerHTML = 'Total Balance: ' + (res.balance == null ? 0 : res.balance);
+    document.getElementById("score").innerHTML = 'Last Game Score: ' + (res.recentScore == null ? 0 : res.recentScore);
+});
 
 getGamesFromDb(user1).then(function(result) {
 	let res = JSON.parse(result)
@@ -164,3 +170,15 @@ function goToGame(me, them) {
 	searchStr = "?user1=" + me + "&user2=" + them
 	window.location.href = './main.html' + searchStr
 }
+
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
+    xmlHttp.send(null);
+}
+

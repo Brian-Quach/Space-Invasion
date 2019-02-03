@@ -30,20 +30,16 @@ let lives = 3;
 
 let game = new Phaser.Game(config);
 
-function preload ()
-{
-
+function preload () {
     this.load.image('sky', 'http://labs.phaser.io/assets/skies/space3.png');
     this.load.image('ship', 'http://labs.phaser.io/assets/sprites/ship.png');
     this.load.image('bullet', 'http://labs.phaser.io/assets/sprites/eggplant.png');
     this.load.image('enemy', 'http://labs.phaser.io/assets/sprites/apple.png');
-
 }
 
 let enemyLocations = [[100, 100], [200, 100], [300, 100], [400, 100], [500, 100]];
 
-function create ()
-{
+function create () {
     // Background
     this.add.image(400, 300, 'sky');
 
@@ -78,8 +74,7 @@ function create ()
 
 let bulletDelay = 0;
 
-function update ()
-{
+function update() {
     let moveSpeed = 200;
 
     if (cursors.left.isDown) {
@@ -90,8 +85,8 @@ function update ()
         player.setVelocityX(0);
     }
 
-    if(fireButton.isDown){
-        if(bulletDelay === 0){
+    if(fireButton.isDown) {
+        if(bulletDelay === 0) {
             fireBullet();
             bulletDelay = 5;
         } else {
@@ -100,17 +95,17 @@ function update ()
     }
 }
 
-function fireBullet(){
+function fireBullet() {
     let bullet = bullets.create(player.x, player.y, 'bullet');
     bullet.setVelocityY(-500);
     bullet.outOfBoundsKill = true;
 }
 
-function spawnEnemy(x, y){
+function spawnEnemy(x, y) {
     let enemy = enemies.create(x, y, 'enemy');
 }
 
-function killEnemy(bullet, enemy){
+function killEnemy(bullet, enemy) {
     bullet.disableBody(true, true);
     enemy.disableBody(true, true);
 

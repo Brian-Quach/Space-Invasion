@@ -49,7 +49,7 @@ challengeBtn.addEventListener("click", function() {
 		goToGame(user1, playerName)
 	})
 
-
+	myTurnDiv.appendChild(newButton)
 }) 
 
 function challengePlayer(playerName) {

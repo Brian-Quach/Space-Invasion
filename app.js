@@ -174,19 +174,19 @@ app.put('/login', function(req, res) {
 
 app.put('/newscore', function(req, res) {
     const username = req.body.username;
-    const score = req.body.score;
+    const newScore = req.body.score;
 
-    console.log(score);
+    console.log(newScore);
 
     if(balances[username] != null){
-        balances[username] += score;
+        balances[username] += newScore;
     } else {
-        balances[username] = score;
+        balances[username] = newScore;
     }
 
-    recentScores[username] = score;
+    recentScores[username] = newScore;
 
-    console.log(username + " got " + score + " points");
+    console.log(username + " got " + newScore + " points");
 
     var usersRef = db.collection('users');
 	var query = usersRef.where('username', '==', username).get()
@@ -198,8 +198,8 @@ app.put('/newscore', function(req, res) {
 	    	snapshot.forEach(doc => {
 	    		console.log(doc.data())
 
+	    		userRef.doc(doc.id).update({score: score+newScore})
 
-				doc.update({doc: doc + score})
 		        console.log(doc.id, '=>', doc.data());
 		    });
 

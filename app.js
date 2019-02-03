@@ -159,10 +159,20 @@ app.put('/newscore', function(req, res) {
     const username = req.body.username;
     const score = req.body.score;
 
-    console.log(score)
+    console.log(score);
+
+    if(balances[username] != null){
+        balances[username] += score;
+    } else {
+        balances[username] = score;
+    }
+
+    recentScores[username] = score;
+
+    console.log(username + " got " + score + " points");
 
     var usersRef = db.collection('users');
-	var query = usersRef.where('username', '==', username).where('password', '==', password).get()
+	var query = usersRef.where('username', '==', username).get()
 	  .then(snapshot => {
 	    if (snapshot.empty) {
 	    	// user does not exist
@@ -186,20 +196,15 @@ app.put('/newscore', function(req, res) {
 	  });
 
 
-
-    if(balances[username] != null){
-    	balances[username] += score;
-	} else {
-    	balances[username] = score;
-	}
 });
 
 let balances = {};
+let recentScores = {};
 
 app.get('/user/:username', function(req, res){
 
 	const username = req.params.username;
-	return res.json({usename: username, balance: balances[username]});
+	return res.json({username: username, balance: balances[username], recentScore: recentScores[username]});
 
 
 });

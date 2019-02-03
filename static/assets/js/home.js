@@ -2,6 +2,9 @@ let myTurnDiv = document.getElementById("myGames")
 let theirTurnDiv = document.getElementById("theirGames")
 let onePlayer = document.getElementById("onePlayer")
 
+let challengeBtn = document.getElementById("challengeBtn")
+let player = document.getElementById("playerInput")
+
 let searchStr = window.location.search
 let user1pos = searchStr.search("user1") + 6
 
@@ -20,6 +23,61 @@ console.log(user1)
 onePlayer.addEventListener("click", function() {
 	goToGame(user1, "none")
 })
+
+challengeBtn.addEventListener("click", function() {
+	let playerName = player.value
+
+	challengePlayer(playerName).then(function(result) {
+		let res = JSON.parse(result)
+		if (res.result) {
+			// need to start the game
+            window.localStorage.setItem('currentUser', name);
+            //goToGame();
+		} else {
+
+		}
+	}).catch(function(error) {
+		console.log("error getting user from database");
+		console.log(error);
+	})
+
+	let newButton = document.createElement('button')
+
+	newButton.innerHTML = "VS: " + playerName
+	newButton.addEventListener("click", function() {
+		console.log("button clicked")
+		goToGame(user1, playerName)
+	})
+
+
+}) 
+
+function challengePlayer(playerName) {
+	return new Promise(function (resolve, reject) {
+        let xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("PUT", '/challenge', true);
+        xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlHttp.onload = function () {
+            if (this.status == 200) {
+                resolve(xmlHttp.responseText);
+            } else {
+                reject({
+                    status: this.status,
+                    statusText: xmlHttp.statusText
+                });
+            }
+        };
+        xmlHttp.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xmlHttp.statusText
+            });
+        };
+        let body = {"me": user1, "them": playerName}
+        xmlHttp.send(JSON.stringify(body));
+    });
+}
+
 
 getGamesFromDb(user1).then(function(result) {
 	let res = JSON.parse(result)

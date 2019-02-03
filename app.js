@@ -132,6 +132,23 @@ app.put('/create', function(req, res) {
 	  });
 })
 
+app.put('/challenge', function(req, res) {
+	const me = req.body.me
+	const them = req.body.them
+
+	var gamesRef = db.collection('games');
+
+	var addDoc = db.collection('games').add({
+	  user1: me,
+	  user2: them,
+	  turn: 0,
+	  user1score: 0,
+	  user2score: 0
+	}).then(ref => {
+	  console.log('Added document with ID: ', ref.id);
+	});
+});
+
 app.put('/login', function(req, res) {
 	console.log("app logging in")
 
@@ -170,7 +187,7 @@ app.put('/newscore', function(req, res) {
 	    } else {
 	    	snapshot.forEach(doc => {
 	    		console.log(doc.data())
-	    		
+
 
 				doc.update({doc: doc + score})
 		        console.log(doc.id, '=>', doc.data());
@@ -203,6 +220,10 @@ app.get('/user/:username', function(req, res){
 
 
 });
+
+
+
+
 
 
 app.get('/home', function(req, res){

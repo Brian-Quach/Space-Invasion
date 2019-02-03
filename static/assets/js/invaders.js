@@ -1,4 +1,10 @@
 
+let gameState = {
+    preload: preload,
+    create: create,
+    update: update
+};
+
 let config = {
     type: Phaser.AUTO,
     width: 800,
@@ -9,11 +15,7 @@ let config = {
             gravity: { y: 0 }
         }
     },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
+    scene: gameState
 };
 
 let cursors;
@@ -23,23 +25,62 @@ let bullets;
 let enemies;
 let enemyBullets;
 
+let userInterface;
+
 let UFO;
 let currUFO;
 
+let playerDead = false;
 
 let scoreText;
 let livesText;
+let stateText;
 
 let score = 0;
 let lives = 3;
 
+function Reset(){
+
+    cursors = null;
+    fireButton = null;
+    player = null;
+    bullets = null;
+    enemies = null;
+    enemyBullets = null;
+
+    UFO = null;
+    currUFO = null;
+
+    playerDead = false;
+
+    scoreText = null;
+    livesText = null;
+    stateText = null;
+
+    score = 0;
+    lives = 3;
+
+}
+
 let game = new Phaser.Game(config);
 
+
 function preload () {
-    this.load.image('sky', 'http://labs.phaser.io/assets/skies/space3.png');
-    this.load.image('ship', 'http://labs.phaser.io/assets/sprites/ship.png');
-    this.load.image('bullet', 'http://labs.phaser.io/assets/sprites/eggplant.png');
-    this.load.image('enemy', 'http://labs.phaser.io/assets/sprites/apple.png');
+    this.load.image('sky', '/assets/sprites/starfield.png');
+    this.load.image('ship', '/assets/sprites/player.png');
+    this.load.image('bullet', '/assets/sprites/bullet.png');
+    this.load.image('bullet2', '/assets/sprites/enemy-bullet.png');
+
+    this.load.spritesheet('enemy',
+        '/assets/sprites/invader32x32x4.png',
+        { frameWidth: 32, frameHeight: 32 }
+    );
+
+    this.load.spritesheet('explode',
+        '/assets/sprites/explode.png',
+        {frameWidth: 128, frameHeight: 128}
+    );
+
 
     this.load.image('enemy2', 'http://labs.phaser.io/assets/sprites/ufo.png');
 }
@@ -68,16 +109,34 @@ function create () {
     this.physics.add.overlap(player, enemyBullets, playerHit, null, this);
     this.physics.add.overlap(player, UFO, UFOCollide, null, this);
 
+    userInterface = this.physics.add.group();
 
     // Spawn Enemy ships
     enemyLocations.forEach(location => {
         spawnEnemy(location[0], location[1]);
     });
 
+    //Animations
+
+    this.anims.create({
+        key: 'enemyIdle',
+        frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'explosion',
+        frames: this.anims.generateFrameNumbers('explode', { start: 0, end: 15 }),
+        frameRate: 10
+    });
+
+
     //
     scoreText = this.add.text(16, 16, 'SCORE: 0', { fontSize: '32px', fill: '#ffffff' });
     livesText = this.add.text(16, 46, 'LIVES: 3', { fontSize: '32px', fill: '#ffffff' });
 
+    stateText = this.add.text(150, 150, ' ', { fontSize: '84px', fill: '#ffffff' });
+    stateText.visible = true;
 
 
     // Control Listeners
@@ -94,6 +153,11 @@ let enemyMoveCounter = 0;
 let enemyMoveThreshold = 100;
 
 function update() {
+
+    if(playerDead){
+        return;
+    }
+
     let moveSpeed = 200;
 
     if (lives <= 0) {
@@ -194,14 +258,21 @@ function spawnEnemy(x, y) {
 }
 
 function enemyFire(enemy){
-    let bullet = enemyBullets.create(enemy.x, enemy.y, 'bullet');
+    let bullet = enemyBullets.create(enemy.x, enemy.y, 'bullet2');
     bullet.setVelocityY(300);
     bullet.outOfBoundsKill = true;
 }
 
 function killEnemy(bullet, enemy) {
     bullet.destroy();
-    enemy.destroy();
+
+    enemy.setTexture('explode');
+
+    enemy.anims.play('explosion', true);
+
+    enemy.on('animationcomplete', function(){
+        enemy.destroy();
+    }, this);
 
     ++score;
 
@@ -210,9 +281,14 @@ function killEnemy(bullet, enemy) {
 
 function killUFO(bullet, enemy){
     bullet.destroy();
-    enemy.destroy();
 
     activeUFO = false;
+
+    enemy.anims.play('explosion', true);
+
+    enemy.on('animationcomplete', function(){
+        enemy.destroy();
+    }, this);
 
     score+=5;
     scoreText.setText('Score: ' + score);
@@ -245,6 +321,19 @@ function UFOCollide(player, UFO){
 
 }
 
+let button;
+
 function gameOver(){
-    console.log("rip");
+
+    playerDead = true;
+
+    enemies.getChildren().forEach(enemy => {
+        enemy.setVelocity(0);
+    });
+
+    player.setVelocity(0);
+
+    stateText.text = "GAME OVER \n SCORE: " + score;
+    stateText.visible = true;
+
 }

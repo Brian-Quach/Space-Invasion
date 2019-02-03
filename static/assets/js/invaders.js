@@ -95,7 +95,7 @@ function update ()
             fireBullet();
             bulletDelay = 5;
         } else {
-            bulletDelay--;
+            --bulletDelay;
         }
     }
 }
@@ -114,6 +114,6 @@ function killEnemy(bullet, enemy){
     bullet.disableBody(true, true);
     enemy.disableBody(true, true);
 
-    score++;
+    ++score;
     scoreText.setText('Score: ' + score);
 }
